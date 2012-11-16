@@ -1,4 +1,4 @@
-package edu.integration.patterns;
+package edu.integration.patterns.reseller;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;

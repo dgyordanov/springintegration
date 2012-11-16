@@ -1,4 +1,4 @@
-package edu.integration.patterns;
+package edu.integration.patterns.reseller;
 
 public interface Reseller {
 

@@ -1,4 +1,4 @@
-package edu.integration.patterns;
+package edu.integration.patterns.producer;
 
 public interface Producer {
 

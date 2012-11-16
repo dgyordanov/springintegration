@@ -6,8 +6,8 @@
 		http://www.springframework.org/schema/integration
 		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd">
 
-	<bean id="reseller" class="edu.integration.patterns.ResellerImpl" />
-	<bean id="producer" class="edu.integration.patterns.ProducerImpl" />
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
 
 	<int:service-activator input-channel="orderChannel"
 		ref="producer" method="buy">
