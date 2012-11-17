@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd">
+
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="nike" class="edu.integration.patterns.producer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.producer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.producer.Reebok" />
+
+	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
+		default-reply-channel="itemInfoResponseChannel"
+		service-interface="edu.integration.patterns.service.ProducersService" />
+
+	<int:publish-subscribe-channel id="itemInfoChannel" />
+	<int:channel id="itemInfoResponseChannel" />
+
+	<int:service-activator input-channel="itemInfoChannel"
+		ref="nike" method="getPrice" output-channel="itemInfoResponseChannel">
+	</int:service-activator>
+
+	<int:service-activator input-channel="itemInfoChannel"
+		output-channel="itemInfoResponseChannel" ref="adidas" method="getPrice">
+	</int:service-activator>
+
+	<int:service-activator input-channel="itemInfoChannel"
+		output-channel="itemInfoResponseChannel" ref="reebok" method="getPrice">
+	</int:service-activator>
+
+</beans>
