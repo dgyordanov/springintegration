@@ -9,10 +9,17 @@
 		http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.1.xsd">
 
+	<!-- Component -->
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
+	<bean id="notifier" class="edu.integration.patterns.notify.SmtpNotifier">
+		<constructor-arg ref="mailSender" />
+		<constructor-arg ref="mailMessage" />
+	</bean>
 
 	<!-- ########## Integration flow ########## -->
 	<int:gateway id="resellerGateway" default-request-channel="orderChannel"
-		service-interface="edu.integration.patterns.service.ProducersService" />
+		service-interface="edu.integration.patterns.service.ProducersService"  />
 
 	<int:service-activator id="producerActivator"
 		input-channel="orderChannel" ref="producer" method="buy"
@@ -30,26 +37,21 @@
 	<int:channel id="sendNotificationChannel" />
 	<int:channel id="notificationErrorChannel" />
 
-	<int:delayer input-channel="notificationErrorChannel"
-		default-delay="3000" output-channel="notifierChannel" scheduler="retryScheduler" />
+	<int:transformer input-channel="notificationErrorChannel"
+		output-channel="notificationDelayerChannel" expression="payload.getFailedMessage().getPayload()" />
 
-	<int:service-activator input-channel="notificationErrorChannel"
+	<int:channel id="notificationDelayerChannel" />
+
+	<int:delayer input-channel="notificationDelayerChannel"
+		default-delay="3000" output-channel="notifierChannel" scheduler="retryScheduler"  />
+
+	<int:service-activator input-channel="sendNotificationChannel"
 		ref="notifier" method="sendNotification" />
 
 	<!-- 3 retries define -->
 	<task:scheduler id="retryScheduler" pool-size="3" />
 
-	<!-- ########## Beans ########## -->
-	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
-
-	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
-
-	<bean id="notifier" class="edu.integration.patterns.notify.SmtpNotifier">
-		<constructor-arg ref="mailSender" />
-		<constructor-arg ref="mailMessage" />
-	</bean>
-
-	<!-- gmail integration setting -->
+	<!-- ########## Email integration ########## -->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com" />
 		<property name="port" value="465" />
