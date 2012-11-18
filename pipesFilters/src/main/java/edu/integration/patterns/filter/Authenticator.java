@@ -5,7 +5,6 @@ import org.springframework.integration.Message;
 import org.springframework.integration.core.MessageSelector;
 
 import edu.integration.patterns.OrderBean;
-import edu.integration.patterns.producer.ProducerImpl;
 
 /**
  * Authentication filter module
@@ -19,7 +18,7 @@ public class Authenticator implements MessageSelector {
     private static final String EXPECTED_USERNAME = "dido";
     private static final String EXPECTED_PASSWORD = "pass";
 
-    private static final Logger logger = Logger.getLogger(ProducerImpl.class);
+    private static final Logger logger = Logger.getLogger(Authenticator.class);
 
     @Override
     public boolean accept(Message<?> message) {
