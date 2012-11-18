@@ -74,6 +74,7 @@
 	<bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage">
 		<property name="from" value="spring.integration@gmail.com" />
 		<property name="subject" value="Test Spring integration" />
+		<property name="text" value="Test Spring integration body" />
 	</bean>
 
 </beans>
