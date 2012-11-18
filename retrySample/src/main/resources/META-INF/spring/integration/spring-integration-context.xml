@@ -19,7 +19,13 @@
 
 	<!-- ########## Integration flow ########## -->
 	<int:gateway id="resellerGateway" default-request-channel="orderChannel"
-		service-interface="edu.integration.patterns.service.ProducersService"  />
+		service-interface="edu.integration.patterns.service.ProducersService"
+		error-channel="globalErrorChannel" />
+
+	<int:channel id="globalErrorChannel" />
+
+	<int:logging-channel-adapter expression="'Error: '.concat(payload.toString())"
+		channel="globalErrorChannel" level="FATAL" />
 
 	<int:service-activator id="producerActivator"
 		input-channel="orderChannel" ref="producer" method="buy"
@@ -32,24 +38,22 @@
 		ref="notifierGateway" />
 
 	<int:gateway id="notifierGateway" default-request-channel="sendNotificationChannel"
-		error-channel="notificationErrorChannel" />
+		error-channel="notificationErrorChannel" default-reply-timeout="2000" />
 
 	<int:channel id="sendNotificationChannel" />
-	<int:channel id="notificationErrorChannel" />
-
-	<int:transformer input-channel="notificationErrorChannel"
-		output-channel="notificationDelayerChannel" expression="payload.getFailedMessage().getPayload()" />
-
-	<int:channel id="notificationDelayerChannel" />
-
-	<int:delayer input-channel="notificationDelayerChannel"
-		default-delay="3000" output-channel="notifierChannel" scheduler="retryScheduler"  />
 
 	<int:service-activator input-channel="sendNotificationChannel"
 		ref="notifier" method="sendNotification" />
 
-	<!-- 3 retries define -->
-	<task:scheduler id="retryScheduler" pool-size="3" />
+	<int:channel id="notificationErrorChannel" />
+
+	<int:delayer input-channel="notificationErrorChannel"
+		default-delay="3000" output-channel="transformerChannel" />
+
+	<int:channel id="transformerChannel" />
+
+	<int:transformer input-channel="transformerChannel"
+		output-channel="notifierChannel" expression="payload.getFailedMessage().getPayload()" />
 
 	<!-- ########## Email integration ########## -->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">

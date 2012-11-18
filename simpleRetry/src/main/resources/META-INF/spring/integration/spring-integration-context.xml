@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+
+	<!-- Component -->
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
+
+	<!-- ########## Integration flow ########## -->
+	<int:gateway id="resellerGateway" default-request-channel="orderChannel"
+		service-interface="edu.integration.patterns.service.ProducersService"
+		error-channel="errorChannel" />
+
+	<int:service-activator id="producerActivator"
+		input-channel="orderChannel" ref="producer" method="buy"/>
+
+	<int:transformer input-channel="errorChannel"
+		output-channel="delayerChannel" expression="payload.getFailedMessage().getPayload()" />
+
+	<int:channel id="delayerChannel" />
+
+	<int:delayer input-channel="delayerChannel"
+		default-delay="3000" output-channel="orderChannel" scheduler="retryScheduler" />
+
+	<task:scheduler id="retryScheduler" />
+
+</beans>
