@@ -1,5 +1,11 @@
 package edu.integration.patterns;
 
+/**
+ * Immutable bean which encapsulates an order
+ * 
+ * @author Diyan Yordanov
+ * 
+ */
 public class OrderBean {
 
     private final String username;
@@ -26,6 +32,9 @@ public class OrderBean {
 
     @Override
     public String toString() {
-        return "username: " + username + "; password: " + password + "; itemId: " + itemId;
+        StringBuilder result = new StringBuilder();
+        result.append("username: ").append(username).append("; password: ").append(password)
+                .append("; itemId: ").append(itemId);
+        return result.toString();
     }
 }

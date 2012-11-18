@@ -7,8 +7,15 @@ import org.springframework.integration.core.MessageSelector;
 import edu.integration.patterns.OrderBean;
 import edu.integration.patterns.producer.ProducerImpl;
 
+/**
+ * Authentication filter module
+ * 
+ * @author Diyan Yordanov
+ * 
+ */
 public class Authenticator implements MessageSelector {
 
+    // Static credentials
     private static final String EXPECTED_USERNAME = "dido";
     private static final String EXPECTED_PASSWORD = "pass";
 
@@ -26,6 +33,13 @@ public class Authenticator implements MessageSelector {
 
     }
 
+    /**
+     * Simple authentication mechanism
+     * 
+     * @param username
+     * @param password
+     * @return true if the authentication is successful
+     */
     private boolean authenticate(String username, String password) {
         boolean isAuthenticated = EXPECTED_USERNAME.equals(username)
                 && EXPECTED_PASSWORD.equals(password);

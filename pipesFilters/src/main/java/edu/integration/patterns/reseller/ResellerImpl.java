@@ -19,7 +19,6 @@ public class ResellerImpl implements Reseller, ApplicationContextAware {
         logger.info("Invoking producersService.....");
         producersService.buy(order);
         logger.info("producersService invoked");
-
     }
 
     @Override
