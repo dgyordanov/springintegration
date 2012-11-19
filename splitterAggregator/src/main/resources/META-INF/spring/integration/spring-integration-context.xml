@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/xml
+       	http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd			
+		http://www.springframework.org/schema/integration/stream
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd"
+		>
+		
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="nike" class="edu.integration.patterns.manufacturer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.manufacturer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.manufacturer.Reebok" />
+
+	<int:channel id="itemInfoChannel" />
+	<int:channel id="responseChannel" />
+	<int:channel id="responseAggregatorChannel" />
+	<int:channel id="nikeChannel" />
+	<int:channel id="adidasChannel" />
+	<int:channel id="reebokChannel" />
+	<int:channel id="invalidManufacturerChannel" />
+	
+	<int:gateway id="tradeGateway" default-request-channel="itemsChannel"
+		default-reply-channel="responseChannel"
+		service-interface="edu.integration.patterns.service.ManufacturersService" />
+
+	<!-- splitter for batch messages -->
+	<int:splitter input-channel="itemsChannel" ref="batchMessageSplitter"
+		output-channel="itemInfoChannel">
+	</int:splitter>
+	
+	<bean id="batchMessageSplitter"
+		class="edu.integration.patterns.splitter.MessageSplitter" />
+
+	<!-- aggregator for result messages -->	
+	<bean id="orderAggregator" class="edu.integration.patterns.aggregator.MessageAggregator" />
+	<bean id="correlationStrategy" class="edu.integration.patterns.aggregator.CorrelationStrategy" />	
+	<bean id="releaseStrategy" class="edu.integration.patterns.aggregator.CorrelationStrategy" />	
+	
+	<int:aggregator input-channel="responseAggregatorChannel"
+		output-channel="responseChannel" ref="orderAggregator" method="aggregateOrders" 
+		correlation-strategy="correlationStrategy" release-strategy="releaseStrategy"/>
+
+	<!-- router -->
+	<bean id="messageRouter" class="edu.integration.patterns.router.MessageRouter" />
+	
+	<int:router input-channel="itemInfoChannel" ref="messageRouter"
+		method="route" />
+	
+	<int-stream:stdout-channel-adapter
+	id="ïnvalidManufacturerAdapter" channel="invalidManufacturerChannel" />
+	
+	<int:service-activator input-channel="nikeChannel"
+	ref="nike" method="getPrice" output-channel="responseAggregatorChannel">
+	</int:service-activator>
+
+	<int:service-activator input-channel="adidasChannel"
+		output-channel="responseAggregatorChannel" ref="adidas" method="getPrice">
+	</int:service-activator>
+	
+	<int:service-activator input-channel="reebokChannel"
+		output-channel="responseAggregatorChannel" ref="reebok" method="getPrice">
+	</int:service-activator>
+	
+</beans>

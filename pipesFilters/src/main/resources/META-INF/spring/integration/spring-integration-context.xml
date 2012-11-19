@@ -13,7 +13,7 @@
 		service-interface="edu.integration.patterns.service.NikeService" />
 
 	<int:filter input-channel="orderChannel" ref="selector"
-		output-channel="securedOrderChannel" />
+		output-channel="securedOrderChannel" discard-channel="errorChannel" />
 
 	<bean id="selector" class="edu.integration.patterns.filter.Authenticator" />
 

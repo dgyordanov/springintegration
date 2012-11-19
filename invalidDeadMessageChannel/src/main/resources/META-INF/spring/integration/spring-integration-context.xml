@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:redis="http://www.springframework.org/schema/data/redis"
+	xmlns:int-redis="http://www.springframework.org/schema/integration/redis"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+ 		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.1.xsd
+		http://www.springframework.org/schema/integration/redis http://www.springframework.org/schema/integration/redis/spring-integration-redis-2.1.xsd"
+		>
+		
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="nike" class="edu.integration.patterns.manufacturer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.manufacturer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.manufacturer.Reebok" />
+
+	<int:channel id="itemInfoChannel" />
+	<int:channel id="itemInfoResponseChannel" />
+	<int:channel id="nikeChannel" />
+	<int:channel id="adidasChannel" />
+	<int:channel id="reebokChannel" />
+
+	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
+		default-reply-channel="itemInfoResponseChannel"
+		service-interface="edu.integration.patterns.service.ManufacturersService" />
+
+	<int:recipient-list-router id="manufacturersList"
+		input-channel="itemInfoChannel">
+		<int:recipient channel="authChannel" />
+		<int:recipient channel="adidasChannel" />
+		<int:recipient channel="reebokChannel" />
+	</int:recipient-list-router>
+
+	<int:service-activator input-channel="nikeChannel"
+	ref="nike" method="getPrice" output-channel="itemInfoResponseChannel">
+	</int:service-activator>
+
+	<int:service-activator input-channel="adidasChannel"
+		output-channel="itemInfoResponseChannel" ref="adidas" method="getPrice">
+	</int:service-activator>
+	
+	<int:service-activator input-channel="reebokChannel"
+		output-channel="itemInfoResponseChannel" ref="reebok" method="getPrice">
+	</int:service-activator>
+	
+	<!-- dead letter channel -->
+	<bean id="selector" class="edu.integration.patterns.filter.Authenticator" />
+
+	<int:filter input-channel="authChannel" output-channel="nikeChannel" ref="selector"
+	discard-channel="authErrorChannel" />
+	
+	<int:service-activator input-channel="authErrorChannel"
+		ref="selector" method="onError">
+	</int:service-activator>
+		
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+    	<constructor-arg name="mongo" ref="mongo"/>
+    	<constructor-arg name="databaseName" value="authErrorsDb"/>
+    </bean>
+
+	<!-- Factory bean that creates the Mongo instance -->
+    <bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
+    	<property name="host" value="localhost"/>
+    </bean>
+	
+	<!-- invalid message channel -->
+	<int:channel id="processAdidasError">
+		<int:queue message-store="redisMessageStore" />
+	</int:channel>
+	
+	<int:gateway id="invalidMessage" default-request-channel="processAdidasError"
+		service-interface="edu.integration.patterns.service.InvalidMessageService" />
+	
+	<bean id="redisMessageStore"
+		class="org.springframework.integration.redis.store.RedisMessageStore">
+		<constructor-arg ref="redisConnectionFactory" />
+	</bean>
+
+	<bean id="redisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="port" value="6379" />
+	</bean>
+		
+</beans>

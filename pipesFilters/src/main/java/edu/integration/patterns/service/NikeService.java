@@ -11,6 +11,6 @@ import edu.integration.patterns.OrderBean;
  */
 public interface NikeService {
 
-    void receiveOrder(OrderBean order);
+    void buy(OrderBean order);
 
 }

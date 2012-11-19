@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/xml
+       	http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd"			
+		>
+		
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="nike" class="edu.integration.patterns.manufacturer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.manufacturer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.manufacturer.Reebok" />
+
+	<int:channel id="itemInfoChannel" />
+	<int:channel id="itemInfoResponseChannel" />
+	<int:channel id="nikeTransformerChannel" />
+	<int:channel id="adidasTransformerChannel" />
+	<int:channel id="reebokTransformerChannel" />
+	<int:channel id="nikeChannel" />
+	<int:channel id="adidasChannel" />
+	<int:channel id="reebokChannel" />
+	
+	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
+		default-reply-channel="itemInfoResponseChannel"
+		service-interface="edu.integration.patterns.service.ManufacturersService" />
+
+	<int:recipient-list-router id="manufacturersList"
+		input-channel="itemInfoChannel">
+		<int:recipient channel="nikeTransformerChannel" />
+		<int:recipient channel="adidasTransformerChannel" />
+		<int:recipient channel="reebokTransformerChannel" />
+	</int:recipient-list-router>
+	
+	<!-- transformers -->
+	<!-- nike transformer (object-to-XML) -->
+	<int-xml:marshalling-transformer
+		input-channel="nikeTransformerChannel" output-channel="nikeChannel" marshaller="marshaller"
+		result-type="StringResult">
+	</int-xml:marshalling-transformer>
+	<bean id="marshaller" class="org.springframework.oxm.castor.CastorMarshaller" />
+	
+	<!-- adidas transformer (object-to-JSON) -->
+	<int:object-to-json-transformer
+		input-channel="adidasTransformerChannel" output-channel="adidasChannel">
+	</int:object-to-json-transformer>
+	
+	<!-- reebok transformer (custom) -->
+	<bean id="reebokTransformer"
+	class="edu.integration.patterns.transformer.ReebokMessageTransformer" />
+
+	<int:transformer input-channel="reebokTransformerChannel"
+		output-channel="reebokChannel" ref="reebokTransformer">
+	</int:transformer>	
+		
+	<int:service-activator input-channel="nikeChannel"
+	ref="nike" method="getPrice" output-channel="itemInfoResponseChannel">
+	</int:service-activator>
+
+	<int:service-activator input-channel="adidasChannel"
+		output-channel="itemInfoResponseChannel" ref="adidas" method="getPrice">
+	</int:service-activator>
+	
+	<int:service-activator input-channel="reebokChannel"
+		output-channel="itemInfoResponseChannel" ref="reebok" method="getPrice">
+	</int:service-activator>
+	
+</beans>

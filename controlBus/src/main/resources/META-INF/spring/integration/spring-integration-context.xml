@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/jmx
+		http://www.springframework.org/schema/integration/jmx/spring-integration-jmx-2.0.xsd				
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/xml
+       	http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.1.xsd			
+		http://www.springframework.org/schema/integration/stream
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream-2.1.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
+	<bean id="nike" class="edu.integration.patterns.manufacturer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.manufacturer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.manufacturer.Reebok" />
+
+	<int:channel id="itemInfoChannel">
+		<int:interceptors>
+			<int:wire-tap channel="notification" />
+		</int:interceptors>
+	</int:channel>
+	<int:channel id="itemInfoResponseChannel" />
+	<int:channel id="nikeChannel" />
+	<int:channel id="adidasChannel" />
+	<int:channel id="reebokChannel" />
+	<int:channel id="invalidManufacturerChannel" />
+
+	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
+		default-reply-channel="itemInfoResponseChannel"
+		service-interface="edu.integration.patterns.service.ManufacturersService" />
+
+	<!-- router -->
+	<bean id="messageRouter" class="edu.integration.patterns.router.MessageRouter"></bean>
+
+	<int:router input-channel="itemInfoChannel" ref="messageRouter"
+		method="route" />
+
+	<int-stream:stdout-channel-adapter
+		id="ïnvalidManufacturerAdapter" channel="invalidManufacturerChannel" />
+
+	<int:service-activator input-channel="nikeChannel"
+		ref="nike" method="getPrice" output-channel="itemInfoResponseChannel">
+	</int:service-activator>
+
+	<int:service-activator input-channel="adidasChannel"
+		output-channel="itemInfoResponseChannel" ref="adidas" method="getPrice">
+	</int:service-activator>
+
+	<int:service-activator input-channel="reebokChannel"
+		output-channel="itemInfoResponseChannel" ref="reebok" method="getPrice">
+	</int:service-activator>
+
+	<!-- management beans -->
+	<context:mbean-server/>
+	
+	<bean id="exporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+		<property name="beans">
+			<map>
+				<entry key="edu.integration.patterns.mbean:name=orderMBean"
+					value-ref="orderMBean" />
+			</map>
+		</property>
+<!--   			<property name="registrationBehaviorName" value="REGISTRATION_REPLACE_EXISTING"/> -->
+		<!-- <property name="server" ref="mbeanServer" /> -->
+	</bean>
+
+	<bean id="orderMBean" class="edu.integration.patterns.mbean.OrderMBean" />
+
+	<!-- spring integration with JMX -->
+	<int:channel id="notification" />
+	
+	<int-stream:stdout-channel-adapter channel="notification" append-newline="true"/>
+	
+<!-- 	<int-jmx:notification-publishing-channel-adapter id="jmxNotifier" -->
+<!-- 		channel="notification" object-name="edu.integration.patterns.mbean:name=orderMBeanNotification" -->
+<!-- 		default-notification-type="default.notification.type" /> -->
+
+</beans>
