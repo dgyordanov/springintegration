@@ -20,6 +20,8 @@ public class ResellerImpl implements Reseller, ApplicationContextAware {
         MessageChannel orderChannel = applicationContext.getBean("orderChannel",
                 MessageChannel.class);
         logger.info("Sending order on channel: " + orderChannel);
+        // send() method will block the current thread only if the channel
+        // capacity is full
         orderChannel.send(order);
         logger.info("Order message sent on channel: " + orderChannel);
 

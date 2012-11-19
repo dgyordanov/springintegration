@@ -17,7 +17,7 @@ public class NikeImpl implements Nike, ApplicationContextAware {
     	
 		PollableChannel orderChannel = (PollableChannel) applicationContext
 				.getBean("orderChannel", MessageChannel.class);
-        logger.info("Sending order on channel: " + orderChannel);
+        logger.info("Receiving order on channel: " + orderChannel);
         Message<?> message = (Message<?>) orderChannel.receive();
         Long itemId = (Long) message.getPayload();
         
