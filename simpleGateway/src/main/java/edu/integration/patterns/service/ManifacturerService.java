@@ -1,6 +1,6 @@
 package edu.integration.patterns.service;
 
-public interface ProducersService {
+public interface ManifacturerService {
 
     void buy(long itemId);
 

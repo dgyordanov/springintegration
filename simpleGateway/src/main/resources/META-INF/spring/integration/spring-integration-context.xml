@@ -10,7 +10,7 @@
 	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
 
 	<int:gateway id="tradeGateway" default-request-channel="orderChannel"
-		service-interface="edu.integration.patterns.service.ProducersService" />
+		service-interface="edu.integration.patterns.service.ManifacturerService" />
 
 	<int:service-activator input-channel="orderChannel"
 		ref="manufacturer" method="receiveOrder">
