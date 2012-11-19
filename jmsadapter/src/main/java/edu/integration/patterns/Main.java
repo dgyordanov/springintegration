@@ -3,7 +3,8 @@ package edu.integration.patterns;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jms.core.JmsTemplate;
+
+import edu.integration.patterns.reseller.Reseller;
 
 public final class Main {
 
@@ -15,11 +16,7 @@ public final class Main {
 
         ApplicationContext ac = new ClassPathXmlApplicationContext(
                 "classpath:META-INF/spring/integration/spring-integration-context.xml");
-        JmsTemplate jmsTemplate = ac.getBean("jmsProducerTemplate", JmsTemplate.class);
-        logger.info("Sending message....");
-        jmsTemplate.convertAndSend(ITEM_ID);
-        logger.info("Message sent");
-
+        Reseller reseller = ac.getBean(Reseller.class);
+        reseller.buy(ITEM_ID);
     }
-
 }

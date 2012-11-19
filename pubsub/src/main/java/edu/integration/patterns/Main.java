@@ -15,7 +15,5 @@ public final class Main {
                 "classpath:META-INF/spring/integration/spring-integration-context.xml");
         Reseller testService = ac.getBean(Reseller.class);
         testService.buy(ITEM_ID);
-
     }
-
 }

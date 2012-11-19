@@ -11,7 +11,7 @@
 
 	<!-- Component -->
 	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
-	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
+	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
 	<bean id="notifier" class="edu.integration.patterns.notify.SmtpNotifier">
 		<constructor-arg ref="mailSender" />
 		<constructor-arg ref="mailMessage" />
@@ -19,7 +19,7 @@
 
 	<!-- ########## Integration flow ########## -->
 	<int:gateway id="resellerGateway" default-request-channel="orderChannel"
-		service-interface="edu.integration.patterns.service.ProducersService"
+		service-interface="edu.integration.patterns.service.NikeService"
 		error-channel="globalErrorChannel" />
 
 	<int:channel id="globalErrorChannel" />
@@ -28,7 +28,7 @@
 		channel="globalErrorChannel" level="FATAL" />
 
 	<int:service-activator id="producerActivator"
-		input-channel="orderChannel" ref="producer" method="buy"
+		input-channel="orderChannel" ref="manufacturer" method="receiveOrder"
 		output-channel="notifierChannel" />
 
 	<!-- Retry segment -->

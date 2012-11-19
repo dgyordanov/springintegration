@@ -17,5 +17,4 @@ public final class Main {
         testService.buy(ITEM_ID);
 
     }
-
 }

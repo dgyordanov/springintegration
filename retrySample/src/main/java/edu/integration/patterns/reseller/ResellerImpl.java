@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import edu.integration.patterns.service.ProducersService;
+import edu.integration.patterns.service.NikeService;
 
 public class ResellerImpl implements Reseller, ApplicationContextAware {
 
@@ -14,7 +14,7 @@ public class ResellerImpl implements Reseller, ApplicationContextAware {
 
     @Override
     public void buy(long itemId) {
-        ProducersService producersService = applicationContext.getBean(ProducersService.class);
+        NikeService producersService = applicationContext.getBean(NikeService.class);
         logger.info("Invoking producersService.....");
         producersService.buy(itemId);
         logger.info("producersService invoked");

@@ -13,9 +13,8 @@ public final class Main {
 
         ApplicationContext ac = new ClassPathXmlApplicationContext(
                 "classpath:META-INF/spring/integration/spring-integration-context.xml");
-        Reseller testService = ac.getBean(Reseller.class);
-        testService.buy(ITEM_ID);
-
+        Reseller reseller = ac.getBean(Reseller.class);
+        reseller.buy(ITEM_ID);
     }
 
 }

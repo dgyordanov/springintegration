@@ -7,9 +7,9 @@
 		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd">
 
 	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
-	<bean id="nike" class="edu.integration.patterns.producer.Nike" />
-	<bean id="adidas" class="edu.integration.patterns.producer.Adidas" />
-	<bean id="reebok" class="edu.integration.patterns.producer.Reebok" />
+	<bean id="nike" class="edu.integration.patterns.manufacturer.Nike" />
+	<bean id="adidas" class="edu.integration.patterns.manufacturer.Adidas" />
+	<bean id="reebok" class="edu.integration.patterns.manufacturer.Reebok" />
 
 	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
 		default-reply-channel="itemInfoResponseChannel"

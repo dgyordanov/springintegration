@@ -7,13 +7,10 @@
 		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd">
 
 	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
-	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
+	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
 
-	<int:channel id="orderChannel" />
-
-	<int:service-activator input-channel="orderChannel"
-		ref="producer" method="buy">
-	</int:service-activator>
-
+	<int:channel id="orderChannel">
+		<int:queue capacity="10"/>
+	</int:channel>
 
 </beans>

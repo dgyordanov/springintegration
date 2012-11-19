@@ -7,13 +7,13 @@
 		http://www.springframework.org/schema/integration/spring-integration-2.1.xsd">
 
 	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
-	<bean id="producer" class="edu.integration.patterns.producer.ProducerImpl" />
+	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
 
 	<int:gateway id="tradeGateway" default-request-channel="orderChannel"
 		service-interface="edu.integration.patterns.service.ProducersService" />
 
 	<int:service-activator input-channel="orderChannel"
-		ref="producer" method="buy">
+		ref="manufacturer" method="receiveOrder">
 	</int:service-activator>
 
 </beans>
