@@ -1,6 +1,5 @@
 package edu.integration.patterns;
 
-import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -9,8 +8,6 @@ import edu.integration.patterns.reseller.Reseller;
 public final class Main {
 
     private static final long ITEM_ID = 12231234;
-
-    private static final Logger logger = Logger.getLogger(Main.class);
 
     public static void main(String[] args) {
 

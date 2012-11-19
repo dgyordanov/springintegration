@@ -14,19 +14,20 @@
 
 	<bean id="reseller" class="edu.integration.patterns.reseller.ResellerImpl" />
 	<bean id="manufacturer" class="edu.integration.patterns.manufacturer.NikeImpl" />
-	
-	<jms:message-driven-channel-adapter
-		id="jmsin" destination="requestQueue" channel="jmsToNike" />
 
-	<int:channel id="jmsToNike" />
+	<int:gateway id="tradeGateway" default-request-channel="orderChannel"
+		service-interface="edu.integration.patterns.service.ProducersService" />
+
 	<int:channel id="orderChannel" />
 
 	<jms:outbound-channel-adapter id="jmsout"
 		destination="requestQueue" channel="orderChannel" />
-	
-	<int:gateway id="tradeGateway" default-request-channel="orderChannel"
-		service-interface="edu.integration.patterns.service.ProducersService" />
-		
+
+	<jms:message-driven-channel-adapter
+		id="jmsin" destination="requestQueue" channel="jmsToNike" />
+
+	<int:channel id="jmsToNike" />
+
 	<int:service-activator id="nikeActivator"
 		input-channel="jmsToNike" ref="manufacturer" method="receiveOrder" />
 
@@ -46,9 +47,9 @@
 		<constructor-arg value="queue.demo" />
 	</bean>
 
-<!-- 	<bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate"> -->
-<!-- 		<constructor-arg ref="connectionFactory" /> -->
-<!-- 		<property name="defaultDestination" ref="requestQueue" /> -->
-<!-- 	</bean> -->
+	<!-- <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate"> -->
+	<!-- <constructor-arg ref="connectionFactory" /> -->
+	<!-- <property name="defaultDestination" ref="requestQueue" /> -->
+	<!-- </bean> -->
 
 </beans>
