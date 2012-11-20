@@ -25,7 +25,7 @@ public final class Main {
         // Get the reseller bean
         Reseller testService = ac.getBean(Reseller.class);
 
-        // Send orde rto the reseller
+        // Send order to the reseller
         OrderBean order = new OrderBean(USERNAME, PASSWORD, ITEM_ID);
         testService.buy(order);
 
