@@ -26,7 +26,7 @@
 	
 	<int:gateway id="tradeGateway" default-request-channel="itemInfoChannel"
 		default-reply-channel="itemInfoResponseChannel"
-		service-interface="edu.integration.patterns.service.ManufacturersService" />
+		service-interface="edu.integration.patterns.service.ManufacturersService" default-reply-timeout="3000"/>
 
 	<!-- router -->
 	<bean id="messageRouter" class="edu.integration.patterns.router.MessageRouter"></bean>
