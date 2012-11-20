@@ -47,9 +47,4 @@
 		<constructor-arg value="queue.demo" />
 	</bean>
 
-	<!-- <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate"> -->
-	<!-- <constructor-arg ref="connectionFactory" /> -->
-	<!-- <property name="defaultDestination" ref="requestQueue" /> -->
-	<!-- </bean> -->
-
 </beans>

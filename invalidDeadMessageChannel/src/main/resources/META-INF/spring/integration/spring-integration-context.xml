@@ -49,7 +49,7 @@
 	<!-- dead letter channel -->
 	<bean id="selector" class="edu.integration.patterns.filter.Authenticator" />
 
-	<int:filter input-channel="authChannel" output-channel="nikeChannel" ref="selector"
+	<int:filter input-channel="authChannel" output-channel="reebokChannel" ref="selector"
 	discard-channel="authErrorChannel" />
 	
 	<int:service-activator input-channel="authErrorChannel"
