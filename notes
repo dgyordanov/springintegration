@@ -1,0 +1,35 @@
+
+1) Overview of enterprise integration (problems and possible solutions
+shared db, shared file, messaging, RPC, loosely coupling - why is it useful)
+2) What are the Enterprise Integration Patterns ?
+3) What is Spring Integration ?
+4) General overview (+picture) - define the problem
+5) Examples: 
+
+	Dido
+	1. simpleChannel/pollingChannel - example without service activator
+	2. simpleActivator - service activator
+	3. simpleGateway/asyncGateway - messaging gateway
+	4. jmsAdapter (requires ActiveMQ on default port) - adapter for sending messages to ActiveMQ
+	5. pipesFilters - authentication and/or encryption to a particular producer
+	6. retry - a more advanced example (retry logic with notification module)
+	7. pubsub -add 2 more producers - nike, reebok and adidas.
+
+	Marto
+	8. recipientList - list of the recipient subscribers
+	9. invalidDeadMessageChannel (requires MongoDB/Redis) - Invalid/dead message channel
+	10. transformer - different producers expects different messages
+	11. router - content based router - send message based on type of provider (For example adidas producer and adidas item).
+	12. splitterAggregator - batch order request with a single response. Split into 2 messages and send each of them to the corresponding modul(producer and payment).
+	13. controlBus - control bus and message persitence (+guaranteed delivery, mongo/relational adapter)
+
+6) patterns not used in the example and how they might be used in the overall system
+from the demo
+
+for the demo: 
+	activemq
+	mongodb
+	redis -> https://github.com/rgl/redis/downloads
+	jconsole
+
+
